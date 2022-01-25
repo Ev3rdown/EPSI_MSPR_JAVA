@@ -1,4 +1,4 @@
-import java.awt.Desktop;
+/* import java.awt.Desktop;
 import java.io.*;
 
 class ShowGeneratedHtml {
@@ -75,3 +75,4 @@ class ShowGeneratedHtml {
         Desktop.getDesktop().browse(f.toURI());
     }
 }
+ */
