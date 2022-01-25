@@ -32,5 +32,11 @@ public class Agent {
     public List<String> getMateriel() {
         return materiel;
     }
-
+    public String getFullName() {
+        return prenom + " " + nom;
+    }
+    public String getFileName() {
+        String filename = prenom.substring(0,1)+nom;
+        return filename.toLowerCase();
+    }
 }

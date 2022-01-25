@@ -5,11 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,15 +15,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import materiel.Materiel;
+
 public class Agents {
 
     private List<Agent> agents;
-    private HashMap<String, String> listeMateriel;
+    private String workDir;
 
-    public Agents() {
+    public Agents(String workDir) {
+        if(workDir.substring(workDir.length() - 1)!="/"){
+            this.workDir = workDir + "/";
+        }else{
+            this.workDir = workDir;
+        }
         agents = new ArrayList<>();
-        listeMateriel = new HashMap<>();
-        readMateriel();
     }
 
     /**
@@ -40,34 +41,8 @@ public class Agents {
     }
 
     /**
-     * Lit la liste du matériel possible depuis le fichier liste.txt
+     * Create the Agent objects using the list of agent names from the staff file (multi-threaded)
      */
-    private void readMateriel() {
-        String fileUri = "../EPSI_MSPR_1/liste.txt";
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
-
-        try {
-            if (!Files.exists(Path.of(fileUri))) {
-                throw new FileNotFoundException("No file found");
-            }
-            BufferedReader buffer = new BufferedReader(Files.newBufferedReader(Path.of("../EPSI_MSPR_1/liste.txt"),Charset.forName("utf-8")));
-            boolean read = true;
-            int i = 00;
-            while (read) {
-                String line = buffer.readLine();
-                if (line == null || line.trim().equals("")) {
-                    read = false;
-                    continue;
-                }
-                String key = line.substring(0, line.indexOf('\t'));
-                String val = line.substring(line.indexOf('\t'));
-                listeMateriel.put(key, val);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void createAgents() {
         List<String> agentsStrings = readStaffFile();
         ExecutorService executorService = Executors.newFixedThreadPool(6);
@@ -75,8 +50,8 @@ public class Agents {
         Set<Callable<Agent>> callables = new HashSet<Callable<Agent>>();
 
         for (String agentString : agentsStrings) {
-            System.out.println("Added processing task for " + agentString);
-            callables.add(new AgentFileParser(agentString));
+            //System.out.println("Added processing task for " + agentString);
+            callables.add(new AgentFileParser(workDir + agentString));
         }
 
         List<Future<Agent>> futures;
@@ -96,11 +71,44 @@ public class Agents {
         executorService.shutdown();
     }
 
+    public void createAllAgentsPages(Materiel materiel, String outputDir) {
+        if(outputDir.substring(outputDir.length()-1)!="/")outputDir=outputDir+"/";
+
+        File outputDirF = new File(outputDir);
+        if(!outputDirF.isDirectory()){
+            outputDirF.mkdir();
+        }
+
+        ExecutorService executorService = Executors.newFixedThreadPool(6);
+        Set<Callable<Boolean>> callables = new HashSet<Callable<Boolean>>();
+
+        for (Agent agent : agents) {
+            //System.out.println("Added generation task for " + agent.getFullName());
+            callables.add(new AgentPagesCreator(agent,materiel,outputDir));
+        }
+
+        List<Future<Boolean>> futures;
+        try {
+            futures = executorService.invokeAll(callables);
+            for (Future<Boolean> future : futures) {
+                future.get();
+            }
+        } catch (InterruptedException e) {
+            System.out.println("Could not generate pages for all agents, timed out");
+        } catch (ExecutionException e) {
+            System.out.println("An agent's pages haven't been generated, caused by:");
+            System.out.println("------------------BEGIN------------------");
+            e.getCause().printStackTrace();
+            System.out.println("-------------------END-------------------");
+        }
+        executorService.shutdown();
+    }
+
     /**
      * Lit la liste du matériel possible depuis le fichier liste.txt
      */
     private ArrayList<String> readStaffFile() {
-        File file = new File("../EPSI_MSPR_1/staff.txt");
+        File file = new File(workDir+"staff.txt");
         BufferedReader buffer;
         ArrayList<String> lines = new ArrayList<>();
         try {
