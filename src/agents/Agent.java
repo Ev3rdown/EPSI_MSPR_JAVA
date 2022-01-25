@@ -1,15 +1,15 @@
 package agents;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Agent {
     private String prenom;
     private String nom;
     private String mission;
     private String htpasswd;
-    private ArrayList<String> materiel;
+    private List<String> materiel;
 
-    public Agent(String prenom,String nom,String mission,String htpasswd,ArrayList<String> materiel) {
+    public Agent(String prenom,String nom,String mission,String htpasswd,List<String> materiel) {
         this.nom = nom;
         this.prenom = prenom;
         this.mission = mission;
@@ -29,7 +29,7 @@ public class Agent {
     public String getHtpasswd() {
         return htpasswd;
     }
-    public ArrayList<String> getMateriel() {
+    public List<String> getMateriel() {
         return materiel;
     }
 
