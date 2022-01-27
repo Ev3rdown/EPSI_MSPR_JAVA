@@ -9,3 +9,6 @@
 
 ## Planned:
  - generate index.html (re-use agents.getAgents() for agent objects)
+
+## Jar export:
+run:  ```(maven) clean compile assembly:single ```
