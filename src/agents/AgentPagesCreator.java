@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.StringJoiner;
 import java.util.concurrent.Callable;
 
 import materiel.Materiel;
@@ -36,6 +37,15 @@ public class AgentPagesCreator implements Callable<Boolean> {
 
         String html = generateUserPageHtml(agent);
         writeToFile(this.outputDir + "/" + agent.getFileName() + "/" +"index.html", html);
+
+        String json = generateUserPageJson(agent);
+        writeToFile(this.outputDir + "/" + agent.getFileName() + "/" +agent.getFileName()+".json", json);
+
+        String htpasswd = generateUserHtpasswd(agent);
+        writeToFile(this.outputDir + "/" + agent.getFileName() + "/.htpasswd", htpasswd);
+
+        String htaccess = generateUserHtAccess(agent);
+        writeToFile(this.outputDir + "/" + agent.getFileName() + "/.htaccess", htaccess);
 
         return true;
     }
@@ -66,7 +76,7 @@ public class AgentPagesCreator implements Callable<Boolean> {
         );
         html += "\n";
         for (String materiel : agent.getMateriel()) {
-            html += "           <li class=\"equipment-item\">"+ this.materiel.getMaterielValue(materiel) +"</li>" + "\n";
+            html += "           <li class=\"equipment-item\">"+ this.materiel.getMaterielValue(materiel) +"</li>\n";
         }
         html += String.join("\n",
         "       </ul>",
@@ -75,6 +85,41 @@ public class AgentPagesCreator implements Callable<Boolean> {
         "</html>");
 
         return html;
+    }
+
+    /**
+     * Génère le code HTML de la page de l'agent à partir d'un objet agent
+     */
+    public String generateUserPageJson(Agent agent) {
+        // java has no support for JSON wtf -_-
+        String json = "{\"agent\":{ \"prenom\" : \""+agent.getPrenom()+"\", \"nom\" : \""+agent.getNom()+"\", \"mission\" : \""+agent.getMission()+"\", \"materiels\":[";
+        StringJoiner joiner = new StringJoiner(",");
+        for (String materiel : agent.getMateriel()) {
+            joiner.add("{\"materiel\":\""+ this.materiel.getMaterielValue(materiel) +"\"}");
+        }
+        json += joiner.toString() + "]}}";
+
+        return json;
+    }
+
+    /**
+     * Génère le code HTML de la page de l'agent à partir d'un objet agent
+     */
+    public String generateUserHtpasswd(Agent agent) {
+        // java has no support for JSON wtf -_-
+        String htpasswd = agent.getFileName()+":"+agent.getHtpasswd();
+
+        return htpasswd;
+    }
+
+    /**
+     * Génère le code HTML de la page de l'agent à partir d'un objet agent
+     */
+    public String generateUserHtAccess(Agent agent) {
+        // java has no support for JSON wtf -_-
+        String htaccess = "test";
+
+        return htaccess;
     }
 
 }

@@ -10,7 +10,7 @@ public class App {
         ap.listAgents();
         Materiel materiel = new Materiel("../EPSI_MSPR_1/");
         //materiel.printMateriel();
-        ap.createAllAgentsPages(materiel,"./tmp/");
+        ap.createAllAgentsPages(materiel,"./output/");
 
     }
 }

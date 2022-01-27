@@ -37,6 +37,6 @@ public class Agent {
     }
     public String getFileName() {
         String filename = prenom.substring(0,1)+nom;
-        return filename.toLowerCase();
+        return filename.toLowerCase().replace(" ", "_");
     }
 }
