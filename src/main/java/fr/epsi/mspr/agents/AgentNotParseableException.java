@@ -1,4 +1,4 @@
-package agents;
+package fr.epsi.mspr.agents;
 
 public class AgentNotParseableException extends Exception {
 

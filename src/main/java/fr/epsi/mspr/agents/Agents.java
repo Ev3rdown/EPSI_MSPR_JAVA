@@ -1,4 +1,4 @@
-package agents;
+package fr.epsi.mspr.agents;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import materiel.Materiel;
+import fr.epsi.mspr.materiel.Materiel;
 
 public class Agents {
 

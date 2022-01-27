@@ -1,4 +1,4 @@
-package materiel;
+package fr.epsi.mspr.materiel;
 
 public class MaterielNotParseableException extends Exception {
 

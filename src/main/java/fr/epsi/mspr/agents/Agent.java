@@ -1,4 +1,4 @@
-package agents;
+package fr.epsi.mspr.agents;
 
 import java.util.List;
 

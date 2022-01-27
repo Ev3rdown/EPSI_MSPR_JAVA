@@ -1,4 +1,4 @@
-package agents;
+package fr.epsi.mspr.agents;
 
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;

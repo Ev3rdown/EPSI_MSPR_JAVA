@@ -1,4 +1,4 @@
-package agents;
+package fr.epsi.mspr.agents;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.util.StringJoiner;
 import java.util.concurrent.Callable;
 
-import materiel.Materiel;
+import fr.epsi.mspr.materiel.Materiel;
 
 public class AgentPagesCreator implements Callable<Boolean> {
 

@@ -1,4 +1,4 @@
-package materiel;
+package fr.epsi.mspr.materiel;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
