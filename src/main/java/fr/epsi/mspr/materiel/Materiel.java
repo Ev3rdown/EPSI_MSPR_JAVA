@@ -36,7 +36,6 @@ public class Materiel {
      */
     private void readMateriel() throws MaterielNotParseableException {
         String fileUri = this.workDir+"liste.txt";
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
 
         try {
             if (!Files.exists(Path.of(fileUri))) {

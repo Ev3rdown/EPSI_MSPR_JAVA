@@ -1,14 +1,19 @@
 package fr.epsi.mspr.agents;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -43,7 +48,7 @@ public class Agents {
     /**
      * Create the Agent objects using the list of agent names from the staff file (multi-threaded)
      */
-    public void createAgents() {
+    public void parseAgents() {
         List<String> agentsStrings = readStaffFile();
         ExecutorService executorService = Executors.newFixedThreadPool(6);
 
@@ -71,7 +76,7 @@ public class Agents {
         executorService.shutdown();
     }
 
-    public void createAllAgentsPages(Materiel materiel, String outputDir) {
+    public void createAgentsPages(Materiel materiel, String outputDir) {
         if(outputDir.substring(outputDir.length()-1)!="/")outputDir=outputDir+"/";
 
         File outputDirF = new File(outputDir);
@@ -104,6 +109,15 @@ public class Agents {
         executorService.shutdown();
     }
 
+    public void createAgentsHtpasswdFile(String outputDir) throws IOException {
+        outputDir = prepareOutputDir(outputDir);
+        StringJoiner htpasswd = new StringJoiner("\n");
+        for (Agent agent : agents) {
+            htpasswd.add(agent.getFileName()+":"+agent.getHtpasswd());
+        }
+        writeToFile(outputDir+".htpasswd", htpasswd.toString());
+    }
+
     /**
      * Lit la liste du matériel possible depuis le fichier liste.txt
      */
@@ -134,5 +148,19 @@ public class Agents {
 
     public List<Agent> getAgents() {
         return this.agents;
+    }
+
+    public static String prepareOutputDir(String outputDir) throws IOException {
+        if(outputDir.substring(outputDir.length()-1)!="/")outputDir=outputDir+"/";
+        File outputDirF = new File(outputDir);
+        if(!outputDirF.isDirectory()){
+            outputDirF.mkdir();
+        }
+        return outputDir;
+    }
+    public static void writeToFile(String uri,String content) throws IOException {
+        BufferedWriter writer = Files.newBufferedWriter(Path.of(uri), StandardCharsets.UTF_8);
+        writer.write(content);
+        writer.close();
     }
 }

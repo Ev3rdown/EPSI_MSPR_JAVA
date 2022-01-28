@@ -1,15 +1,14 @@
 package fr.epsi.mspr.agents;
 
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.StringJoiner;
 import java.util.concurrent.Callable;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import fr.epsi.mspr.materiel.Materiel;
 
@@ -30,30 +29,21 @@ public class AgentPagesCreator implements Callable<Boolean> {
         if (!Files.exists(Path.of(this.outputDir), LinkOption.NOFOLLOW_LINKS )){
             throw new FileNotFoundException("Couldn't find work folder");
         }
-        File agentDir = new File(this.outputDir.concat(agent.getFileName()));
-        if (!agentDir.exists()){
-            agentDir.mkdir();
-        }
+        Agents.prepareOutputDir(this.outputDir.concat(agent.getFileName()));
 
         String html = generateUserPageHtml(agent);
-        writeToFile(this.outputDir + "/" + agent.getFileName() + "/" +"index.html", html);
+        Agents.writeToFile(this.outputDir + "/" + agent.getFileName() + "/" +"index.html", html);
 
         String json = generateUserPageJson(agent);
-        writeToFile(this.outputDir + "/" + agent.getFileName() + "/" +agent.getFileName()+".json", json);
+        Agents.writeToFile(this.outputDir + "/" + agent.getFileName() + "/" +agent.getFileName()+".json", json);
 
-        String htpasswd = generateUserHtpasswd(agent);
-        writeToFile(this.outputDir + "/" + agent.getFileName() + "/.htpasswd", htpasswd);
+        //String htpasswd = generateUserHtpasswd(agent);
+        //Agents.writeToFile(this.outputDir + "/" + agent.getFileName() + "/.htpasswd", htpasswd);
 
         String htaccess = generateUserHtAccess(agent);
-        writeToFile(this.outputDir + "/" + agent.getFileName() + "/.htaccess", htaccess);
+        Agents.writeToFile(this.outputDir + "/" + agent.getFileName() + "/.htaccess", htaccess);
 
         return true;
-    }
-
-    private void writeToFile(String uri,String content) throws IOException {
-        BufferedWriter writer = Files.newBufferedWriter(Path.of(uri), StandardCharsets.UTF_8);
-        writer.write(content);
-        writer.close();
     }
 
     /**
@@ -91,22 +81,26 @@ public class AgentPagesCreator implements Callable<Boolean> {
      * Génère le code HTML de la page de l'agent à partir d'un objet agent
      */
     public String generateUserPageJson(Agent agent) {
-        // java has no support for JSON wtf -_-
-        String json = "{\"agent\":{ \"prenom\" : \""+agent.getPrenom()+"\", \"nom\" : \""+agent.getNom()+"\", \"mission\" : \""+agent.getMission()+"\", \"materiels\":[";
-        StringJoiner joiner = new StringJoiner(",");
-        for (String materiel : agent.getMateriel()) {
-            joiner.add("{\"materiel\":\""+ this.materiel.getMaterielValue(materiel) +"\"}");
-        }
-        json += joiner.toString() + "]}}";
+        JsonObject jsonObj = new JsonObject();
+        JsonObject jsonAgent = new JsonObject();
+        jsonObj.add("agent", jsonAgent);
 
-        return json;
+        jsonAgent.addProperty("prenom",agent.getPrenom());
+        jsonAgent.addProperty("nom",agent.getNom());
+        jsonAgent.addProperty("mission",agent.getMission());
+        JsonArray jArMateriel = new JsonArray();
+
+        for (String materiel : agent.getMateriel()) {
+            jArMateriel.add(this.materiel.getMaterielValue(materiel));
+        }
+        jsonAgent.add("materiel", jArMateriel);
+        return jsonObj.toString();
     }
 
     /**
      * Génère le code HTML de la page de l'agent à partir d'un objet agent
      */
     public String generateUserHtpasswd(Agent agent) {
-        // java has no support for JSON wtf -_-
         String htpasswd = agent.getFileName()+":"+agent.getHtpasswd();
 
         return htpasswd;
@@ -117,9 +111,14 @@ public class AgentPagesCreator implements Callable<Boolean> {
      */
     public String generateUserHtAccess(Agent agent) {
         // java has no support for JSON wtf -_-
-        String htaccess = "test";
+        StringJoiner htaccess = new StringJoiner("\n");
+        htaccess.add("AuthType Basic");
+        htaccess.add("AuthName \"Réservé à l'agent\"");
+        htaccess.add("AuthBasicProvider file");
+        htaccess.add("AuthUserFile htdocs/.htpasswd");
+        htaccess.add("Require user "+agent.getFileName());
 
-        return htaccess;
+        return htaccess.toString();
     }
 
 }

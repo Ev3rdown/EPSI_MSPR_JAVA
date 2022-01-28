@@ -10,17 +10,25 @@ import fr.epsi.mspr.materiel.Materiel;
 public class App
 {
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        System.out.println("Beginning operations");
+        String srcDir = "../EPSI_MSPR_1/";
+        String outDir = "./output/";
+        if(args.length>0 && args[0].length()>0){
+            outDir = args[0];
+        }
+        if(args.length>1 && args[1].length()>0){
+            srcDir = args[1];
+        }
 
-
-        Agents ap = new Agents("../EPSI_MSPR_1/");
-        ap.createAgents();
-        ap.listAgents();
+        Agents ap = new Agents(srcDir);
+        ap.parseAgents();
+        //ap.listAgents();
         try {
-            Materiel materiel = new Materiel("../EPSI_MSPR_1/");
+            Materiel materiel = new Materiel(srcDir);
             //materiel.printMateriel();
-            ap.createAllAgentsPages(materiel,"./output/");
+            ap.createAgentsPages(materiel,outDir);
+            ap.createAgentsHtpasswdFile(outDir);
+            System.out.println("End of operations");
         } catch (Exception e) {
             System.out.println("Couldn't parse the equipment");
         }
