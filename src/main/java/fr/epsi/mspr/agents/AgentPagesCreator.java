@@ -91,7 +91,10 @@ public class AgentPagesCreator implements Callable<Boolean> {
         JsonArray jArMateriel = new JsonArray();
 
         for (String materiel : agent.getMateriel()) {
-            jArMateriel.add(this.materiel.getMaterielValue(materiel));
+            JsonObject jOb = new JsonObject();
+            jOb.addProperty("key", materiel);
+            jOb.addProperty("value", this.materiel.getMaterielValue(materiel));
+            jArMateriel.add(jOb);
         }
         jsonAgent.add("materiel", jArMateriel);
         return jsonObj.toString();

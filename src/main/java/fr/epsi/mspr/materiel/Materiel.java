@@ -28,7 +28,9 @@ public class Materiel {
     }
 
     public String getMaterielValue(String key) {
-        return this.listeMateriel.get(key);
+        String val = this.listeMateriel.get(key);
+        if(val==null)System.out.println("Warning, equipment list doesn't contain key \""+key+"\"");
+        return val;
     }
 
     /**
