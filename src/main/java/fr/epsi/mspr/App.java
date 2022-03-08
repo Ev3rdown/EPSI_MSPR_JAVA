@@ -25,13 +25,25 @@ public class App
         //ap.listAgents();
         try {
             Materiel materiel = new Materiel(srcDir);
-            //materiel.printMateriel();
             ap.createAgentsPages(materiel,outDir);
-            ap.createAgentsHtpasswdFile(outDir);
-            System.out.println("End of operations");
         } catch (Exception e) {
             System.out.println("Couldn't parse the equipment");
+            System.exit(1);
         }
 
+        try{
+            ap.createAgentsHtpasswdFile(outDir);
+        }catch(Exception e){
+            System.out.println("Couldn't create indexes");
+            System.exit(2);
+        }
+
+        try{
+            ap.createAgentsIndexes(outDir);
+        }catch(Exception e){
+            System.out.println("Couldn't create indexes");
+            System.exit(3);
+        }
+        System.out.println("End of operations");
     }
 }

@@ -109,6 +109,15 @@ public class Agents {
         executorService.shutdown();
     }
 
+    public void createAgentsIndexes(String outputDir) throws IOException {
+        outputDir = prepareOutputDir(outputDir);
+        AgentsIndexCreator aic = new AgentsIndexCreator(agents, outputDir);
+        String index = aic.generateIndex();
+        String indexJson = aic.generateIndexJSON();
+        writeToFile(outputDir+"index.html", index);
+        writeToFile(outputDir+"index.json", indexJson);
+    }
+
     public void createAgentsHtpasswdFile(String outputDir) throws IOException {
         outputDir = prepareOutputDir(outputDir);
         StringJoiner htpasswd = new StringJoiner("\n");

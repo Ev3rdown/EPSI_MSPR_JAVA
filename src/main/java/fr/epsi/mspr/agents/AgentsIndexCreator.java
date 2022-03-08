@@ -1,6 +1,5 @@
 package fr.epsi.mspr.agents;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -10,13 +9,11 @@ import com.google.gson.JsonObject;
 class AgentsIndexCreator {
     private List<Agent> agents;
 
-    public AgentsIndexCreator(List<Agent> agents,String outDir) throws IOException {
-        outDir = Agents.prepareOutputDir(outDir);
-        Agents.writeToFile(generateIndexJSON(), outDir+"index.json");
-        Agents.writeToFile(generateIndex(), outDir+"index.html");
+    public AgentsIndexCreator(List<Agent> agents,String outDir) {
+        this.agents = agents;
     }
 
-    private String generateIndex() {
+    public String generateIndex() {
         StringJoiner html = new StringJoiner("\n");
         html.add("");
         html.add("");
@@ -24,7 +21,7 @@ class AgentsIndexCreator {
         return html.toString();
     }
 
-    private String generateIndexJSON() {
+    public String generateIndexJSON() {
         JsonObject jOb = new JsonObject();
         JsonArray jAr = new JsonArray();
         for (Agent agent : agents) {
