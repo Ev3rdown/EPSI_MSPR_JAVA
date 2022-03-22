@@ -9,14 +9,13 @@
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>mspr</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <name>mspr_java</name>
 
   <properties>
     <java.version>11</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
+    <jar.finalName>${project.name}</jar.finalName>
   </properties>
 
   <dependencies>
@@ -39,6 +38,7 @@
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
           <configuration>
+            <finalName>${project.name}</finalName>
             <archive>
               <manifest>
                 <mainClass>fr.epsi.mspr.App</mainClass>
@@ -47,6 +47,7 @@
             <descriptorRefs>
               <descriptorRef>jar-with-dependencies</descriptorRef>
             </descriptorRefs>
+            <appendAssemblyId>false</appendAssemblyId>
           </configuration>
         </plugin>
         <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
