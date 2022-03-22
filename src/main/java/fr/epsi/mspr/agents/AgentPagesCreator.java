@@ -92,6 +92,7 @@ public class AgentPagesCreator implements Callable<Boolean> {
         jsonAgent.addProperty("prenom",agent.getPrenom());
         jsonAgent.addProperty("nom",agent.getNom());
         jsonAgent.addProperty("mission",agent.getMission());
+        jsonAgent.addProperty("image","./"+agent.getFileName()+"/image."+getAgentImageExtension(agent));
         JsonArray jArMateriel = new JsonArray();
 
         for (String materiel : agent.getMateriel()) {
