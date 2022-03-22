@@ -1,5 +1,6 @@
 package fr.epsi.mspr.agents;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public class Agent {
@@ -8,13 +9,15 @@ public class Agent {
     private String mission;
     private String htpasswd;
     private List<String> materiel;
+    private Path image;
 
-    public Agent(String prenom,String nom,String mission,String htpasswd,List<String> materiel) {
+    public Agent(String prenom,String nom,String mission,String htpasswd,List<String> materiel,Path image) {
         this.nom = nom;
         this.prenom = prenom;
         this.mission = mission;
         this.htpasswd = htpasswd;
         this.materiel = materiel;
+        this.image = image;
     }
 
     public String getPrenom() {
@@ -38,5 +41,8 @@ public class Agent {
     public String getFileName() {
         String filename = prenom.substring(0,1)+nom;
         return filename.toLowerCase().replace(" ", "_");
+    }
+    public Path getImagePath() {
+        return this.image;
     }
 }

@@ -1,9 +1,11 @@
 package fr.epsi.mspr.agents;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.StringJoiner;
 import java.util.concurrent.Callable;
 
@@ -37,6 +39,7 @@ public class AgentPagesCreator implements Callable<Boolean> {
         String json = generateUserPageJson(agent);
         Agents.writeToFile(this.outputDir + "/" + agent.getFileName() + "/" +agent.getFileName()+".json", json);
 
+        copyID(agent);
         //String htpasswd = generateUserHtpasswd(agent);
         //Agents.writeToFile(this.outputDir + "/" + agent.getFileName() + "/.htpasswd", htpasswd);
 
@@ -49,7 +52,7 @@ public class AgentPagesCreator implements Callable<Boolean> {
     /**
      * Génère le code HTML de la page de l'agent à partir d'un objet agent
      */
-    public String generateUserPageHtml(Agent agent) {
+    private String generateUserPageHtml(Agent agent) {
         String html = String.join("\n",
         "<!DOCTYPE html>",
         "<html lang=\"fr\">",
@@ -58,6 +61,7 @@ public class AgentPagesCreator implements Callable<Boolean> {
         "   <title>Fiche agent - "+ agent.getPrenom() + ", " + agent.getNom() +"</title>",
         "</head>",
         "<body>",
+        "   <div class=\"image\"><img style=\"max-width:250px\" src=\"image."+getAgentImageExtension(agent)+"\"/></div>",
         "   <div class=\"firstname\">"+agent.getPrenom()+"</div>",
         "   <div class=\"lastname\">"+agent.getNom()+"</div>",
         "   <div class=\"mission\">"+agent.getMission()+"</div>",
@@ -78,9 +82,9 @@ public class AgentPagesCreator implements Callable<Boolean> {
     }
 
     /**
-     * Génère le code HTML de la page de l'agent à partir d'un objet agent
+     * Génère le code JSON de la page de l'agent à partir d'un objet agent
      */
-    public String generateUserPageJson(Agent agent) {
+    private String generateUserPageJson(Agent agent) {
         JsonObject jsonObj = new JsonObject();
         JsonObject jsonAgent = new JsonObject();
         jsonObj.add("agent", jsonAgent);
@@ -100,19 +104,13 @@ public class AgentPagesCreator implements Callable<Boolean> {
         return jsonObj.toString();
     }
 
-    /**
-     * Génère le code HTML de la page de l'agent à partir d'un objet agent
-     */
-    public String generateUserHtpasswd(Agent agent) {
+    private String generateUserHtpasswd(Agent agent) {
         String htpasswd = agent.getFileName()+":"+agent.getHtpasswd();
 
         return htpasswd;
     }
 
-    /**
-     * Génère le code HTML de la page de l'agent à partir d'un objet agent
-     */
-    public String generateUserHtAccess(Agent agent) {
+    private String generateUserHtAccess(Agent agent) {
         // java has no support for JSON wtf -_-
         StringJoiner htaccess = new StringJoiner("\n");
         htaccess.add("AuthType Basic");
@@ -124,4 +122,28 @@ public class AgentPagesCreator implements Callable<Boolean> {
         return htaccess.toString();
     }
 
+    private String getAgentImageExtension(Agent agent) {
+        String fileName = agent.getImagePath().toString();
+        int i = fileName.lastIndexOf('.');
+        int p = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+
+        if (i > p) {
+           return fileName.substring(i+1);
+        }
+        return "";
+    }
+
+    /**
+     * @throws IOException
+     */
+    private void copyID(Agent agent) throws IOException {
+        if (!Files.exists(Path.of(this.outputDir), LinkOption.NOFOLLOW_LINKS )){
+            throw new FileNotFoundException("Couldn't find work folder");
+        }
+
+        String extension = getAgentImageExtension(agent);
+
+        Path copied = Path.of(this.outputDir + "/" + agent.getFileName() + "/image." + extension);
+        Files.copy(agent.getImagePath(), copied, StandardCopyOption.REPLACE_EXISTING);
+    }
 }

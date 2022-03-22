@@ -56,7 +56,7 @@ public class Agents {
 
         for (String agentString : agentsStrings) {
             //System.out.println("Added processing task for " + agentString);
-            callables.add(new AgentFileParser(workDir + agentString));
+            callables.add(new AgentFileParser(workDir, agentString));
         }
 
         List<Future<Agent>> futures;

@@ -1,30 +1,37 @@
 package fr.epsi.mspr.agents;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 public class AgentFileParser implements Callable<Agent> {
 
-    private String agentFileURI;
+    private String agentURI;
+    private String workdir;
 
     /**
      * @param agentFileString - Uri of the agent's file
      * @param agents - synchronizedList of the agents
      */
-    public AgentFileParser(String agentFileURI){
-        this.agentFileURI = agentFileURI;
+    public AgentFileParser(String workdir, String agentURI){
+        this.agentURI = agentURI;
+        this.workdir = workdir;
     }
 
 
     @Override
     public Agent call() throws Exception{
         //System.out.println("Beginning parsing in thread "+Thread.currentThread().getName());
-        String fileUri = this.agentFileURI+".txt";
+        String fileUri = workdir+agentURI+".txt";
 
         List<String> agentInfo = new ArrayList<String>();
         Agent agent = null;
@@ -43,7 +50,13 @@ public class AgentFileParser implements Callable<Agent> {
             agentInfo.subList(0, 5).clear();
             List<String> materiel = agentInfo;
 
-            agent = new Agent(prenom, nom, mission, htpasswd, materiel);
+            Path image = null;
+            try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get("./"+workdir+"/cartes_id"), agentURI+".*")) {
+                for (Path path : dirStream) image = path;
+            }
+            if (image==null) throw new AgentNotParseableException("Can't find image corresponding to agent "+prenom+" "+nom);
+
+            agent = new Agent(prenom, nom, mission, htpasswd, materiel, image);
             return agent;
         } catch (Exception e) {
             throw new AgentNotParseableException("Malformed line in agent file");
