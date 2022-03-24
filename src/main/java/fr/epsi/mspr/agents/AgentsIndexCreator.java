@@ -181,7 +181,7 @@ class AgentsIndexCreator {
         for (Agent agent : agents) {
             JsonObject jAgent = new JsonObject();
             jAgent.addProperty("fullname", agent.getFullName());
-            jAgent.addProperty("agentUrl", "./"+agent.getFileName()+"/"+agent.getFileName()+".json");
+            jAgent.addProperty("agentUrl", agent.getFileName()+"/"+agent.getFileName()+".json");
             jAr.add(jAgent);
         }
         jOb.add("agents", jAr);
